@@ -6,7 +6,7 @@ This plugin lets you easily jump to a blade view.
 
 ## Instalation 
 
-* Clone this repository to `sublime-text-3/Packages` folder
+* Clone this repository to `sublime-text-3/Packages` folder.
 * Add this keybinding. 
 
 ```json
