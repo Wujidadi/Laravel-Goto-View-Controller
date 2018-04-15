@@ -4,7 +4,7 @@ This plugin lets you easily jump to a blade view.
 
 ![Example](/img/showcase.gif)
 
-## Instalation 
+## Installation 
 
 * Clone this repository to `sublime-text-3/Packages` folder.
 * Add this keybinding. 
@@ -12,4 +12,4 @@ This plugin lets you easily jump to a blade view.
 ```json
     { "keys": ["ctrl+shift+b"], "command": "laravel_goto_view" }
 ```
-* Done.
+* Done. :wink:
