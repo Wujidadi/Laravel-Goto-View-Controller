@@ -4,7 +4,6 @@ import sublime_plugin
 
 class LaravelGotoViewController(sublime_plugin.TextCommand):
     def run(self, edit):
-        global callbacks_on_load
         # only trigger the command if the cursor is in these scopes
         supported_scopes = [
             "string.quoted.single.php",
@@ -20,39 +19,12 @@ class LaravelGotoViewController(sublime_plugin.TextCommand):
             if supported_scope in scopes:
 
                 text = self.getText()
+
                 window = self.view.window()
-                root = window.extract_variables()
-
-                controllers_path = root['folder'] + '/app/Http/Controllers/'
-                views_path = root['folder'] + '/resources/views/'
-
-                if '@' in text:
-                    controller, method = text.split('@')
-
-                    filename = controller + '.php'
-                    found_view = window.open_file(controllers_path + filename)
-
-                    if not found_view.is_loading():
-                        self.show_at_center(found_view, method)
-                    else:
-                        sublime.set_timeout(lambda: self.show_at_center(found_view, method), 100)
-
-                elif 'controller' in text.lower():
-                    filename = text + '.php'
-                    window.open_file(controllers_path + filename)
-
-                else:
-                    filename = text + '.blade.php'
-                    window.open_file(views_path + filename)
-
-    def show_at_center(self, view, method):
-        symbols = view.symbols()
-
-        for region, symbol_method in symbols:
-            if symbol_method == method:
-                view.show_at_center(region.end())
-                view.sel().clear()
-                view.sel().add(region.end())
+                window.run_command("show_overlay", {
+                    "overlay": "goto",
+                    "text": "resources/views/" + text + ".blade.php"}
+                )
 
     def getCursorPos(self):
         return self._getFirstSelection().begin()
@@ -88,4 +60,3 @@ class LaravelGotoViewController(sublime_plugin.TextCommand):
     def _clearSelection(self):
         self.view.sel().clear()
         self.view.sel().add(self.cursorPos)
-
