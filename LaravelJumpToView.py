@@ -2,7 +2,7 @@ import sublime
 import sublime_plugin
 
 
-class LaravelGotoView(sublime_plugin.TextCommand):
+class LaravelGotoViewController(sublime_plugin.TextCommand):
     def run(self, edit):
         global callbacks_on_load
         # only trigger the command if the cursor is in these scopes
