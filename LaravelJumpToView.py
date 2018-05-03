@@ -31,7 +31,7 @@ class LaravelGotoViewController(sublime_plugin.TextCommand):
             filename = controller + '.php'
 
             self.open_file(path.for_controllers() + filename)
-            Event.listen('view.on_load_async', lambda view:
+            Event.listen('view.on_activated_async', lambda view:
                          self.show_at_center(view, method)
                          )
 
@@ -93,5 +93,5 @@ class LaravelGotoViewController(sublime_plugin.TextCommand):
 
 
 class DocumentSyncListener(sublime_plugin.EventListener):
-    def on_load_async(self, view):
-        Event.fire("view.on_load_async", view)
+    def on_activated_async(self, view):
+        Event.fire("view.on_activated_async", view)
