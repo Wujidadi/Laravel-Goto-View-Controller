@@ -23,7 +23,6 @@ class LaravelGotoViewController(sublime_plugin.TextCommand):
             return
 
         text = self.getText()
-        window = self.view.window()
         path = Path(self.view)
 
         if '@' in text:
@@ -31,18 +30,18 @@ class LaravelGotoViewController(sublime_plugin.TextCommand):
 
             filename = controller + '.php'
 
-            window.open_file(path.for_controllers() + filename)
+            self.open_file(path.for_controllers() + filename)
             Event.listen('view.on_load_async', lambda view:
                          self.show_at_center(view, method)
                          )
 
         elif 'controller' in text.lower():
             filename = text + '.php'
-            window.open_file(path.for_controllers() + filename)
+            self.open_file(path.for_controllers() + filename)
 
         else:
             filename = text + '.blade.php'
-            window.open_file(path.for_views() + filename)
+            self.open_file(path.for_views() + filename)
 
     def show_at_center(self, view, method):
         symbols = view.symbols()
@@ -52,6 +51,10 @@ class LaravelGotoViewController(sublime_plugin.TextCommand):
                 view.show_at_center(region.end())
                 view.sel().clear()
                 view.sel().add(region.end())
+
+    def open_file(self, path):
+        window = self.view.window()
+        return window.open_file(path)
 
     def getCursorPos(self):
         return self._getFirstSelection().begin()
