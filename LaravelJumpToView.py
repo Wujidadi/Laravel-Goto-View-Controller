@@ -1,49 +1,48 @@
-import sublime
 import sublime_plugin
+from .core.Event import Event
+from .core.Path import Path
 
 
 class LaravelGotoViewController(sublime_plugin.TextCommand):
-    def run(self, edit):
-        global callbacks_on_load
-        # only trigger the command if the cursor is in these scopes
+    def is_supported(self):
         supported_scopes = [
             "string.quoted.single.php",
             "string.quoted.double.php"
         ]
 
-        self.cursorPos = self.getCursorPos()
-
         # all scopes at the cursor position
+        self.cursorPos = self.getCursorPos()
         scopes = self.getScopes()
 
         for supported_scope in supported_scopes:
-            if supported_scope in scopes:
+            return True if supported_scope in scopes else False
 
-                text = self.getText()
-                window = self.view.window()
-                root = window.extract_variables()
+    def run(self, edit):
+        if not self.is_supported():
+            self.view.run_command('lsp_symbol_definition')
+            return
 
-                controllers_path = root['folder'] + '/app/Http/Controllers/'
-                views_path = root['folder'] + '/resources/views/'
+        text = self.getText()
+        window = self.view.window()
+        path = Path(self.view)
 
-                if '@' in text:
-                    controller, method = text.split('@')
+        if '@' in text:
+            controller, method = text.split('@')
 
-                    filename = controller + '.php'
-                    found_view = window.open_file(controllers_path + filename)
+            filename = controller + '.php'
 
-                    if not found_view.is_loading():
-                        self.show_at_center(found_view, method)
-                    else:
-                        sublime.set_timeout(lambda: self.show_at_center(found_view, method), 100)
+            window.open_file(path.for_controllers() + filename)
+            Event.listen('view.on_load_async', lambda view:
+                         self.show_at_center(view, method)
+                         )
 
-                elif 'controller' in text.lower():
-                    filename = text + '.php'
-                    window.open_file(controllers_path + filename)
+        elif 'controller' in text.lower():
+            filename = text + '.php'
+            window.open_file(path.for_controllers() + filename)
 
-                else:
-                    filename = text + '.blade.php'
-                    window.open_file(views_path + filename)
+        else:
+            filename = text + '.blade.php'
+            window.open_file(path.for_views() + filename)
 
     def show_at_center(self, view, method):
         symbols = view.symbols()
@@ -89,3 +88,7 @@ class LaravelGotoViewController(sublime_plugin.TextCommand):
         self.view.sel().clear()
         self.view.sel().add(self.cursorPos)
 
+
+class DocumentSyncListener(sublime_plugin.EventListener):
+    def on_load_async(self, view):
+        Event.fire("view.on_load_async", view)
