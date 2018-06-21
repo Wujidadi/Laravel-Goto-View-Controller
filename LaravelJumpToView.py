@@ -4,6 +4,8 @@ from .core.Path import Path
 
 
 class LaravelGotoViewController(sublime_plugin.TextCommand):
+    listener = None
+
     def is_supported(self):
         supported_scopes = [
             "string.quoted.single.php",
@@ -31,7 +33,7 @@ class LaravelGotoViewController(sublime_plugin.TextCommand):
             filename = controller + '.php'
 
             self.open_file(path.for_controllers() + filename)
-            Event.listen('view.on_activated_async', lambda view:
+            LaravelGotoViewController.listener = Event.listen('view.on_activated_async', lambda view:
                          self.show_at_center(view, method)
                          )
 
@@ -51,6 +53,9 @@ class LaravelGotoViewController(sublime_plugin.TextCommand):
                 view.show_at_center(region.end())
                 view.sel().clear()
                 view.sel().add(region.end())
+
+        if LaravelGotoViewController.listener:
+            LaravelGotoViewController.listener()
 
     def open_file(self, path):
         window = self.view.window()
