@@ -57,9 +57,12 @@ class LaravelGotoViewController(sublime_plugin.TextCommand):
         if LaravelGotoViewController.listener:
             LaravelGotoViewController.listener()
 
-    def open_file(self, path):
+    def open_file(self, fullpath):
+        if not Path.exists(fullpath):
+            Path.make_directory(fullpath)
+
         window = self.view.window()
-        return window.open_file(path)
+        window.open_file(fullpath)
 
     def getCursorPos(self):
         return self._getFirstSelection().begin()
