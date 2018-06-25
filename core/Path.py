@@ -18,3 +18,4 @@ class Path:
     def make_directory(fullpath):
         dir_path = os.path.dirname(fullpath)
         os.makedirs(dir_path)
+        open(fullpath, "a")

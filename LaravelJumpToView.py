@@ -26,6 +26,7 @@ class LaravelGotoViewController(sublime_plugin.TextCommand):
 
         text = self.getText()
         path = Path(self.view)
+        self.w = self.view.window()
 
         if '@' in text:
             controller, method = text.split('@')
@@ -33,9 +34,11 @@ class LaravelGotoViewController(sublime_plugin.TextCommand):
             filename = controller + '.php'
 
             self.open_file(path.for_controllers() + filename)
-            LaravelGotoViewController.listener = Event.listen('view.on_activated_async', lambda view:
-                         self.show_at_center(view, method)
-                         )
+            LaravelGotoViewController.listener = Event.listen(
+                'view.on_activated_async',
+                lambda view:
+                    self.show_at_center(view, method)
+            )
 
         elif 'controller' in text.lower():
             filename = text + '.php'
@@ -59,10 +62,23 @@ class LaravelGotoViewController(sublime_plugin.TextCommand):
 
     def open_file(self, fullpath):
         if not Path.exists(fullpath):
-            Path.make_directory(fullpath)
+            self.shouldCreateFileAndFolder(fullpath)
+            return
+        self.w.open_file(fullpath)
 
-        window = self.view.window()
-        window.open_file(fullpath)
+    def shouldCreateFileAndFolder(self, fullpath):
+        options = ["Create {}".format(fullpath), "cancel"]
+        self.w.show_quick_panel(
+            options,
+            lambda id:
+                self.createFileAndFolder(id, fullpath)
+        )
+
+    def createFileAndFolder(self, id, fullpath):
+        if id != 0:
+            return
+        Path.make_directory(fullpath)
+        self.w.open_file(fullpath)
 
     def getCursorPos(self):
         return self._getFirstSelection().begin()
