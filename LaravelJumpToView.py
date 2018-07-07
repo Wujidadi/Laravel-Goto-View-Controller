@@ -19,9 +19,9 @@ class LaravelGotoViewController(sublime_plugin.TextCommand):
         for supported_scope in supported_scopes:
             return True if supported_scope in scopes else False
 
-    def run(self, edit):
+    def run(self, edit, fallback_command="goto_definition"):
         if not self.is_supported():
-            self.view.run_command('lsp_symbol_definition')
+            self.view.window().run_command(fallback_command)
             return
 
         text = self.getText()
