@@ -27,6 +27,9 @@ class LaravelGotoViewController(sublime_plugin.TextCommand):
         text = self.getText()
         path = Path(self.view)
         self.w = self.view.window()
+        
+        if '\\' in text:
+            text = text.replace('\\', '/')
 
         if '@' in text:
             controller, method = text.split('@')
