@@ -5,6 +5,6 @@ Based on predragnikolic's work, but added two lines in `LaravelGotoViewControlle
 Those two lines are:
 
 ```python
-	if '\\' in text:
-	text = text.replace('\\', '/')
+        if '\\' in text:
+            text = text.replace('\\', '/')
 ```
